@@ -13,7 +13,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.options("/")
+@app.options("")
 def options_handler():
     return Response()
 
@@ -24,8 +24,12 @@ with open(DATA_PATH) as f:
     DATA = json.load(f)
 
 
-@app.post("/")
+
+
+@app.post("")
 def analytics(payload: dict):
+
+
 
     result = {}
 
