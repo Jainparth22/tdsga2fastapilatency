@@ -1,11 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 import json, os
 import numpy as np
 
 app = FastAPI()
 
-# ---- Enable CORS ----
+# ---- CORS (VERY IMPORTANT) ----
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,7 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---- Load dataset ----
+# ---- Load data ----
 BASE_DIR = os.path.dirname(__file__)
 DATA_PATH = os.path.join(BASE_DIR, "..", "q-vercel-latency.json")
 
@@ -22,9 +22,23 @@ with open(DATA_PATH) as f:
     DATA = json.load(f)
 
 
-# ✅ Required endpoint
+# ✅ Handle preflight request (REQUIRED FOR VERCEL)
+@app.options("/api/latency")
+def options_handler():
+    return Response(
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "*",
+            "Access-Control-Allow-Headers": "*",
+        }
+    )
+
+
+# ✅ Main API
 @app.post("/api/latency")
-def analytics(payload: dict):
+async def analytics(request: Request):
+
+    payload = await request.json()
 
     result = {}
 
@@ -43,4 +57,10 @@ def analytics(payload: dict):
             ),
         }
 
-    return result
+    return Response(
+        content=json.dumps(result),
+        media_type="application/json",
+        headers={
+            "Access-Control-Allow-Origin": "*"
+        },
+    )
