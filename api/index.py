@@ -13,9 +13,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.options("")
-def options_handler():
-    return Response()
+
 
 BASE_DIR = os.path.dirname(__file__)
 DATA_PATH = os.path.join(BASE_DIR, "..", "q-vercel-latency.json")
@@ -26,10 +24,8 @@ with open(DATA_PATH) as f:
 
 
 
-@app.post("")
+@app.post("/api")
 def analytics(payload: dict):
-
-
 
     result = {}
 
